@@ -18,7 +18,7 @@ int main()
 
     //  dependent settings
 
-    std::array<size_t, 2> n_dft {n[0] / 2 + 1, n[1] / 2 + 1}; //  quarter frequency space dims
+    std::array<size_t, 2> n_dft {n[0] / 2 + 1, n[1]}; //  frequency space dims
     double z = z_rel * d; //  evaluation depth
     std::array<double, 2> range_size {range[1] - range[0], range[3] - range[2]},               //  size of range
                           q_center   {.5 * (range[0] + range[1]), .5 * (range[2] + range[3])}; //  laser dot location (x, y)
@@ -41,23 +41,21 @@ int main()
 
     double *q = new double[n[0] * n[1]];
     gaussian_intensity(q, n, x, y, q_P, q_center, q_sd);
+    delete[] x, y;
 
-    //  frequency space Gaussian intensity (via real to complex quarter FFT)
 
-    //  real to complex quarter FFT has n[0] / 2 + 1 by n[1] / 2 + 1 output
-    std::complex<double> *q_dft = new std::complex<double>[n_dft[0] * n_dft[1] + 250000]; //  TODO padding
+
+    //  frequency space Gaussian intensity (via real to complex half FFT)
+
+    //  the first FFT along x is real to complex with no negative output frequencies, so only half memory is needed
+    std::complex<double> *q_dft = new std::complex<double>[n_dft[0] * n_dft[1]];
     fftw_plan plan = fftw_plan_dft_r2c_2d(n[0], n[1], q, reinterpret_cast<fftw_complex *>(q_dft), FFTW_ESTIMATE);
     fftw_execute(plan);
     fftw_destroy_plan(plan);
-
-    /*
-    plan = fftw_plan_dft_c2r_2d(n[0], n[1], reinterpret_cast<fftw_complex *>(q_dft), q, FFTW_ESTIMATE);
-    fftw_execute(plan);
-    fftw_destroy_plan(plan);
-    */
+    delete[] q;
     //  renormalization
-    for (size_t i = 0; i < n[0] * n[1]; i++)
-        q[i] /= n[0] * n[1];
+    for (size_t i = 0; i < n_dft[0] * n_dft[1]; i++)
+        q_dft[i] /= n[0] * n[1];
 
 
 
@@ -74,10 +72,10 @@ int main()
     s_0(s                      , n_dft, k_x, k_y, a);
     s_1(s + n_dft[0] * n_dft[1], n_dft, k_x, k_y, a, q_p);
 
-    store(static_cast<void *>(q_dft), {n_dft[0], n_dft[1], 1}, "0.vti");
-}
 
-//  the q_dft array should be of size n_dft[0] * n_dft[1] instead, but then it segfaults. this is probably due to padding
-//  required by FFTW. need to read documentation more. seems like rather than 1/4 memory, it needs 1/2.
-//  don't worry about this being too much space or whatever; get the project to work first, then optimize, because for example
-//  there's also things like in place FFT that would be even better.
+
+    //  storage
+
+    store(static_cast<void *>(q_dft), {n_dft[0], n_dft[1], 1}, "0.vti");
+    delete[] k_x, k_y, q_dft, s;
+}
