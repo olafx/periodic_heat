@@ -41,7 +41,8 @@ int main()
 
     double *q = new double[n[0] * n[1]];
     gaussian_intensity(q, n, x, y, q_P, q_center, q_sd);
-    delete[] x, y;
+    delete[] x;
+    delete[] y;
 
 
 
@@ -77,5 +78,8 @@ int main()
     //  storage
 
     store(static_cast<void *>(q_dft), {n_dft[0], n_dft[1], 1}, "0.vti");
-    delete[] k_x, k_y, q_dft, s;
+    delete[] k_x;
+    delete[] k_y;
+    delete[] q_dft;
+    delete[] s;
 }
