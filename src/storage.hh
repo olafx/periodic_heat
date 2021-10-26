@@ -1,5 +1,4 @@
 #pragma once
-#include <cstddef>
 #include <array>
 #include <vtkNew.h>
 #include <vtkImageData.h>

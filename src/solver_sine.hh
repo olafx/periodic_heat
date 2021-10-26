@@ -1,7 +1,5 @@
 #pragma once
-#include <cstddef>
 #include <array>
-#include <cmath>
 #include <complex>
 #include <fftw3.h>
 
@@ -22,10 +20,17 @@ void gaussian_intensity(double *q, std::array<size_t, 2> n, double *x, double *y
         }
 }
 
-void s_0(std::complex<double> *s, std::array<size_t, 2> n, double *k_x, double *k_y, std::array<double, 3> a)
-{
+void s_0(std::complex<double> *s, std::array<size_t, 2> n_dft, double *k_x, double *k_y, std::array<double, 3> a)
+{   for (size_t j = 0; j < n_dft[1]; j++)
+        for (size_t i = 0; i < n_dft[0]; i++)
+            s[i + j * n_dft[0]] = 2 * M_PI * sqrt((a[0] * (k_x[i] * k_x[i])
+                                                 + a[1] * (k_y[j] * k_y[j])) / a[2]);
 }
 
-void s_1(std::complex<double> *s, std::array<size_t, 2> n, double *k_x, double *k_y, std::array<double, 3> a, double q_p)
-{
+void s_1(std::complex<double> *s, std::array<size_t, 2> n_dft, double *k_x, double *k_y, std::array<double, 3> a, double q_p)
+{   using namespace std::complex_literals;
+    for (size_t j = 0; j < n_dft[1]; j++)
+        for (size_t i = 0; i < n_dft[0]; i++)
+            s[i + j * n_dft[0]] = sqrt(2i * M_PI) * sqrt((1i / q_p + 2 * M_PI * a[0] * k_x[i] * k_x[i]
+                                                                   + 2 * M_PI * a[1] * k_y[j] * k_y[j]) / a[2]);
 }

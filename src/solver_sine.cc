@@ -27,13 +27,12 @@ int main()
 
     //  space and frequency space coordinates
 
-    double *x   = new double[n[0]], *y   = new double[n[1]],
-           *k_x = new double[n[0]], *k_y = new double[n[1]];
+    double *x   = new double[n[0]],     *y   = new double[n[1]],
+           *k_x = new double[n_dft[0]], *k_y = new double[n_dft[1]];
     linear_fill(x, n[0], range[0], range_size[0] / n[0]);
     linear_fill(y, n[1], range[2], range_size[1] / n[1]);
-    //  probably needs to change. not only does this assume shifted, it also doesn't account for r2c rather than c2c
-    linear_fill(k_x, n[0], -.5 * (n[0] - 1) / range[0], 1 / range_size[0]);
-    linear_fill(k_y, n[1], -.5 * (n[1] - 1) / range[2], 1 / range_size[1]);
+    linear_fill(k_x, n_dft[0], 0,                           1 / range_size[0]);
+    linear_fill(k_y, n_dft[1], -.5 * (n[1] - 1) / range[2], 1 / range_size[1]);
 
 
 
@@ -63,12 +62,12 @@ int main()
     //  sigma for frequencies 0 and 1 / q_p
 
     //  s storage format:
-    //      freq 0       pos k_x[0] k_y[0],        ..., freq 0       pos k_x[n[0] / 2] k_y[0],
+    //      freq 0       pos k_x[0] k_y[0],            ..., freq 0       pos k_x[n_dft[0] - 1] k_y[0],
     //      ...,
-    //      freq 0       pos k_x[0] k_y[n[1] / 2], ..., freq 0       pos k_x[n[0] / 2] k_y[n[1] / 2],
-    //      freq 1 / q_p pos k_x[0] k_y[0],        ..., freq 1 / q_p pos k_x[n[0] / 2] k_y[0],
+    //      freq 0       pos k_x[0] k_y[n_dft[1] - 1], ..., freq 0       pos k_x[n_dft[0] - 1] k_y[n_dft[1] - 1],
+    //      freq 1 / q_p pos k_x[0] k_y[0],            ..., freq 1 / q_p pos k_x[n_dft[0] - 1] k_y[0],
     //      ...,
-    //      freq 1 / q_p pos k_x[0] k_y[n[1] / 2], ..., freq 1 / q_p pos k_x[n[0] / 2] k_y[n[1] / 2],
+    //      freq 1 / q_p pos k_x[0] k_y[n_dft[1] - 1], ..., freq 1 / q_p pos k_x[n_dft[0] - 1] k_y[n_dft[1] - 1],
     std::complex<double> *s = new std::complex<double>[n_dft[0] * n_dft[1] * 2];
     s_0(s                      , n_dft, k_x, k_y, a);
     s_1(s + n_dft[0] * n_dft[1], n_dft, k_x, k_y, a, q_p);
