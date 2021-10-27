@@ -5,9 +5,6 @@
 #include <vtkImageImport.h>
 #include <vtkXMLImageDataWriter.h>
 
-//  TODO temp
-#include <iostream>
-
 void store(void *data, std::array<size_t, 3> n, const char *filename)
 {
     vtkNew<vtkImageImport> image_import;

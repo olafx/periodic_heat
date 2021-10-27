@@ -19,7 +19,7 @@ void eval_coords_real_space(double *x, double *y, array<size_t, 2> n, array<doub
 }
 
 void eval_coords_freq_space(double *k_x, double *k_y, array<size_t, 2> n, array<double, 4> range)
-{   linear_fill(k_x, n[0], 0,                               1 / (range[1] - range[0]));
+{   linear_fill(k_x, n[0], 0,                                        1 / (range[1] - range[0]));
     linear_fill(k_y, n[1], -.5 * (n[1] - 1) / (range[3] - range[2]), 1 / (range[3] - range[2]));
 }
 
