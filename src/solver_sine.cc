@@ -107,7 +107,7 @@ int main()
 
     //  storage
 
-    store(static_cast<void *>(T), {n[0], n[1], n[2]}, "/Volumes/0/Downloads/0.vti");
+    store(static_cast<void *>(T), n, "/Volumes/0/Downloads/0.vti");
 
     delete[] T;
 }
