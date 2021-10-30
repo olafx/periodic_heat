@@ -30,11 +30,11 @@ void eval_sigma_0(complex<double> *s, array<size_t, 3> n, double *k_x, double *k
                                              + a[1] * (k_y[j] * k_y[j])) / a[2]);
 }
 
-void eval_sigma_1(complex<double> *s, array<size_t, 3> n, double *k_x, double *k_y, array<double, 3> a, double q_p)
+void eval_sigma_1(complex<double> *s, array<size_t, 3> n, double *k_x, double *k_y, array<double, 3> a, double q_f)
 {   using namespace std::complex_literals;
     for (size_t j = 0; j < n[1]; j++)
         for (size_t i = 0; i < n[0]; i++)
-            s[i + j * n[0]] = sqrt(2 * M_PI) * sqrt((1i / q_p + 2 * M_PI * a[0] * k_x[i] * k_x[i]
+            s[i + j * n[0]] = sqrt(2 * M_PI) * sqrt((1i * q_f + 2 * M_PI * a[0] * k_x[i] * k_x[i]
                                                               + 2 * M_PI * a[1] * k_y[j] * k_y[j]) / a[2]);
 }
 
@@ -63,10 +63,13 @@ void eval_time_mutual_T_real_space(complex<double> *m_T, complex<double> *m_T_df
 
 
 
-void eval_T(complex<double> *T, complex<double> *m_T, array<size_t, 3> n, double q_p, double t)
+void eval_T(complex<double> *T, complex<double> *m_T, array<size_t, 3> n, double m, double q_p, double t)
 {   using namespace std::complex_literals;
-    complex<double> *m_T_0 = m_T,
-                    *m_T_1 = m_T + n[0] * n[1];
     for (size_t i = 0; i < n[0] * n[1]; i++)
-        T[i] = .5 * (m_T_0[i] + m_T_1[i] * exp(2i * M_PI * t / q_p));
+    {   T[i] = .5 * m_T[i];
+        for (size_t j = 1; j < 2 * m + 1; j++)
+        {   double k = 2 * (j - m) - 1;
+            T[i] += 1i * M_1_PI * k * m_T[i + n[0] * n[1] * j] * exp(2i * M_PI * k / q_p * t);
+        }       
+    }
 }

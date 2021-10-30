@@ -5,7 +5,7 @@ int main()
 {
     //  independent settings
 
-    array<size_t, 3> n     {768, 128, 128};          //  real space dims
+    array<size_t, 3> n     {768, 128, 128};         //  real space dims
     array<double, 3> a     {3e-7, 1e-7, 1e-7};      //  heat diffusivities (x, y, z)
     array<double, 6> range {0, .1, 0, .1, 0, 4e-3}; //  real space range (x, y, z)
     double b_z   = .1,   //  heat conductivity along z (related to but not independent of a[2])
@@ -70,9 +70,9 @@ int main()
     //      ...,
     //      freq 1 / q_p pos x[0] y[n[1] - 1], ..., freq 1 / q_p pos x[n[0] - 1] y[n[1] - 1]
     //  T storage format:
-    //      pos x[0] y[0]        z[0], ..., pos x[n[0] - 1] y[0]        z[0],
+    //      pos x[0] y[0]        z[0],        ..., pos x[n[0] - 1] y[0]        z[0],
     //      ...,
-    //      pos x[0] y[n[1] - 1] z[0], ..., pos x[n[0] - 1] y[n[1] - 1] z[0],
+    //      pos x[0] y[n[1] - 1] z[0],        ..., pos x[n[0] - 1] y[n[1] - 1] z[0],
     //      ...,
     //      pos x[0] y[0]        z[n[2] - 1], ..., pos x[n[0] - 1] y[0]        z[n[2] - 1],
     //      ...,

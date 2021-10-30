@@ -23,4 +23,4 @@ Sinusoidal intensity.
 
 Periodic heaviside intensity.
 
-*TODO*
+![step 1](https://raw.githubusercontent.com/olafx/periodic_heat/master/renders/step%201.png)
