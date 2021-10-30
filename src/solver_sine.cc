@@ -5,9 +5,9 @@ int main()
 {
     //  independent settings
 
-    array<size_t, 3> n     {768, 768, 96};          //  real space dims
+    array<size_t, 3> n     {768, 128, 128};          //  real space dims
     array<double, 3> a     {3e-7, 1e-7, 1e-7};      //  heat diffusivities (x, y, z)
-    array<double, 6> range {0, .1, 0, .1, 0, 1e-4}; //  real space range (x, y, z)
+    array<double, 6> range {0, .1, 0, .1, 0, 4e-3}; //  real space range (x, y, z)
     double b_z   = .1,   //  heat conductivity along z (related to but not independent of a[2])
            q_P   = .5,   //  power (area integrated intensity) of laser
            q_p   = 10,   //  period of sinusoidal laser intensity
@@ -22,25 +22,17 @@ int main()
 
     //  space and frequency space coordinates
 
-    double *x   = new double[n[0]], *y   = new double[n[1]], *z  = new double[n[2]],
-           *k_x = new double[n[0]], *k_y = new double[n[1]];
-    eval_coords_real_space(x,   y,   z, n, range);
-    eval_coords_freq_space(k_x, k_y, n,    range);
+    double *z  = new double[n[2]], *k_x = new double[n[0]], *k_y = new double[n[1]];
+    linear_fill(z, n[2], range[4], (range[5] - range[4]) / n[2]);
+    linear_fill(k_x, n[0], 0,                                        1 / (range[1] - range[0]));
+    linear_fill(k_y, n[1], -.5 * (n[1] - 1) / (range[3] - range[2]), 1 / (range[3] - range[2]));
 
 
-
-    //  real space Gaussian intensity
-
-    complex<double> *q = new complex<double>[n[0] * n[1]];
-    eval_intensity_real_space(q, n, x, y, q_P, q_center, q_sd);
-    delete[] x;
-    delete[] y;
 
     //  frequency space Gaussian intensity
 
-    complex<double> *q_dft = new complex<double>[n[0] * n[1]];
-    eval_intensity_freq_space(q_dft, n, q);
-    delete[] q;
+    complex<double> *q_ft = new complex<double>[n[0] * n[1]];
+    eval_intensity_freq_space(q_ft, n, k_x, k_y, q_P, q_center, q_sd);
 
 
 
@@ -92,29 +84,21 @@ int main()
     for (size_t i = 0; i < n[2]; i++)
     {
         //  time mutual T components for frequencies 0 and 1 / q_p in frequency space
-
-        eval_time_mutual_T_freq_space(m_T_dft,               n, q_dft, s,               b_z, z[i], z[n[2] - 1]);
-        eval_time_mutual_T_freq_space(m_T_dft + n[0] * n[1], n, q_dft, s + n[0] * n[1], b_z, z[i], z[n[2] - 1]);
-
-
+        eval_time_mutual_T_freq_space(m_T_dft,               n, q_ft, s,               b_z, z[i], z[n[2] - 1]);
+        eval_time_mutual_T_freq_space(m_T_dft + n[0] * n[1], n, q_ft, s + n[0] * n[1], b_z, z[i], z[n[2] - 1]);
 
         //  time mutual T components for frequencies 0 and 1 / q_p in real space
-
         eval_time_mutual_T_real_space(m_T,               m_T_dft,               n);
         eval_time_mutual_T_real_space(m_T + n[0] * n[1], m_T_dft + n[0] * n[1], n);
 
-
-
-
         //  T in real space
-
         eval_T(T + i * n[0] * n[1], m_T, n, q_p, t);
     }
 
 
 
     delete[] z;
-    delete[] q_dft;
+    delete[] q_ft;
     delete[] s;
     delete[] m_T_dft;
     delete[] m_T;
@@ -123,7 +107,7 @@ int main()
 
     //  storage
 
-    store(static_cast<void *>(T), {n[0], n[1], n[2]}, "0.vti");
+    store(static_cast<void *>(T), {n[0], n[1], n[2]}, "/Volumes/0/Downloads/0.vti");
 
     delete[] T;
 }
