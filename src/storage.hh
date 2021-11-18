@@ -5,7 +5,7 @@
 #include <vtkImageImport.h>
 #include <vtkXMLImageDataWriter.h>
 
-void store(void *data, std::array<size_t, 3> n, const char *filename)
+void store(void *const data, const std::array<std::size_t, 3> n, const char *const filename)
 {
     vtkNew<vtkImageImport> image_import;
     image_import->SetDataSpacing(1, 1, 1);
